@@ -48,4 +48,14 @@ public class Client {
     public void setChatId(String chatId) {
         this.chatId = chatId;
     }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "phoneNumber=" + phoneNumber +
+                ", stationIds=" + stationIds +
+                ", botToken='" + botToken + '\'' +
+                ", chatId='" + chatId + '\'' +
+                '}';
+    }
 }

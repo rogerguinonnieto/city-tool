@@ -2,6 +2,7 @@ package api;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import model.Data;
 
@@ -16,6 +17,6 @@ public class Bicing {
                 .target(API_URL)
                 .request(MediaType.APPLICATION_JSON)
                 .header("Authorization", TOKEN)
-                .get(Data.class);
+                .get(new GenericType<Data>() {});
     }
 }

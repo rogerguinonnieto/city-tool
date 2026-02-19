@@ -1,9 +1,14 @@
 package model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Station {
-    public int station_id;
-    public int num_bikes_available;
-    public int num_docks_available;
+    private int station_id;
+    private int num_bikes_available;
+    private int num_docks_available;
+    private long last_reported;
+    private boolean is_charging_station;
+    private String status;
 
     public Station() {
     }
@@ -36,6 +41,42 @@ public class Station {
 
     public void setNum_docks_available(int num_docks_available) {
         this.num_docks_available = num_docks_available;
+    }
+
+    public long getLast_reported() {
+        return last_reported;
+    }
+
+    public void setLast_reported(long last_reported) {
+        this.last_reported = last_reported;
+    }
+
+    public boolean isIs_charging_station() {
+        return is_charging_station;
+    }
+
+    public void setIs_charging_station(boolean is_charging_station) {
+        this.is_charging_station = is_charging_station;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "station_id=" + station_id +
+                ", num_bikes_available=" + num_bikes_available +
+                ", num_docks_available=" + num_docks_available +
+                ", last_reported=" + last_reported +
+                ", is_charging_station=" + is_charging_station +
+                ", status='" + status + '\'' +
+                '}';
     }
 
 }
