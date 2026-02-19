@@ -1,5 +1,122 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BAN - Bicing Notifier</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        const BASE_URL = "http://localhost:8080/ban/api";
+
+        function getStations() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4) {
+                    if(xmlhttp.status == 200) {
+                        document.getElementById("result").innerHTML = "<pre>" + JSON.stringify(JSON.parse(xmlhttp.responseText), null, 2) + "</pre>";
+                    } else {
+                        document.getElementById("result").innerHTML = "Error fetching stations. Status: " + xmlhttp.status;
+                    }
+                }
+            };
+            xmlhttp.open("GET", BASE_URL + "/stations", true);
+            xmlhttp.send();
+        }
+
+        function subscribeClient() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4) {
+                    if(xmlhttp.status == 200) {
+                        document.getElementById("result").innerHTML = "<strong>Success!</strong> Client subscribed to stations.";
+                    } else {
+                        document.getElementById("result").innerHTML = "Error subscribing client. Status: " + xmlhttp.status;
+                    }
+                }
+            };
+
+            var phoneStr = document.getElementById("phone").value;
+            var stationsStr = document.getElementById("stationsIds").value;
+            var token = document.getElementById("telegramToken").value;
+            var chat = document.getElementById("chatId").value;
+
+            var stationsArray = stationsStr.replace(/\s/g,"").split(",").map(Number);
+
+            var params = {
+                "phoneNumber": parseInt(phoneStr),
+                "stationIds": stationsArray,
+                "botToken": token,
+                "chatId": chat
+            };
+
+            xmlhttp.open("POST", BASE_URL + "/clients/subscribe", true);
+            xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xmlhttp.send(JSON.stringify(params));
+        }
+
+        function getClients() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4) {
+                    if(xmlhttp.status == 200) {
+                        document.getElementById("result").innerHTML = "<pre>" + JSON.stringify(JSON.parse(xmlhttp.responseText), null, 2) + "</pre>";
+                    } else {
+                        document.getElementById("result").innerHTML = "Error fetching clients. Status: " + xmlhttp.status;
+                    }
+                }
+            };
+            xmlhttp.open("GET", BASE_URL + "/clients", true);
+            xmlhttp.send();
+        }
+    </script>
+</head>
 <body>
-<h2>Hello World!</h2>
+
+    <h1>Bicing Free Slots Notifier <span>BAN</span></h1>
+
+    <div class="layout">
+
+        <div class="actions">
+
+            <section>
+                <h2>1. Get Stations</h2>
+                <p>Retrieve the cached list of Bicing stations.</p>
+                <button type="button" onclick="getStations()">Get Stations</button>
+            </section>
+
+            <section>
+                <h2>2. Subscribe Client</h2>
+                <form id="subscribeForm">
+                    <div class="field">
+                        <label for="phone">Phone Number</label>
+                        <input type="number" id="phone" placeholder="e.g., 600123456" required>
+                    </div>
+                    <div class="field">
+                        <label for="stationsIds">Station IDs (comma-separated)</label>
+                        <input type="text" id="stationsIds" placeholder="e.g., 1, 5, 12" required>
+                    </div>
+                    <button type="button" onclick="subscribeClient()">Subscribe Client</button>
+                </form>
+            </section>
+
+            <section>
+                <h2>3. Get Clients</h2>
+                <p>Retrieve the list of all registered clients.</p>
+                <button type="button" onclick="getClients()">Get Clients</button>
+            </section>
+
+        </div>
+
+        <div class="response-panel">
+            <div class="response-header">
+                <span class="response-label">Server Response</span>
+                <span class="response-dots">
+                    <span></span><span></span><span></span>
+                </span>
+            </div>
+            <div id="result">Responses from the server will appear here...</div>
+        </div>
+
+    </div>
+
 </body>
 </html>
