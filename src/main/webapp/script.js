@@ -1,13 +1,55 @@
 const BASE_URL = "http://localhost:8080/citytool/api";
 
+function createHtmlTableFromJson(jsonData) {
+    if (!jsonData || jsonData.length === 0) {
+        return "<p>No data available.</p>";
+    }
+
+    if (!Array.isArray(jsonData)) {
+        jsonData = [jsonData];
+    }
+
+    const headers = Object.keys(jsonData[0]);
+
+    let tableHtml = '<div class="table-container"><table class="pretty-table"><thead><tr>';
+    
+    // Build Headers
+    headers.forEach(header => {
+        const cleanHeader = header.charAt(0).toUpperCase() + header.slice(1);
+        tableHtml += `<th>${cleanHeader}</th>`;
+    });
+    tableHtml += '</tr></thead><tbody>';
+
+    // Build Rows
+    jsonData.forEach(row => {
+        tableHtml += '<tr>';
+        headers.forEach(header => {
+            let cellValue = row[header];
+            
+            if (typeof cellValue === 'object' && cellValue !== null) {
+                cellValue = Array.isArray(cellValue) ? cellValue.join(', ') : JSON.stringify(cellValue);
+            }
+            
+            tableHtml += `<td>${cellValue !== undefined ? cellValue : ''}</td>`;
+        });
+        tableHtml += '</tr>';
+    });
+
+    tableHtml += '</tbody></table></div>';
+    return tableHtml;
+}
+
+// --- API Calls ---
+
 function getStations() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
-                document.getElementById("result").innerHTML = "<pre>" + JSON.stringify(JSON.parse(xmlhttp.responseText), null, 2) + "</pre>";
+                const data = JSON.parse(xmlhttp.responseText);
+                document.getElementById("result").innerHTML = createHtmlTableFromJson(data);
             } else {
-                document.getElementById("result").innerHTML = "Error fetching stations. Status: " + xmlhttp.status;
+                document.getElementById("result").innerHTML = `<p class="error">Error fetching stations. Status: ${xmlhttp.status}</p>`;
             }
         }
     };
@@ -20,9 +62,9 @@ function subscribeClient() {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
-                document.getElementById("result").innerHTML = "<strong>Success!</strong> Client subscribed to stations.";
+                document.getElementById("result").innerHTML = "<p class='success'><strong>Success!</strong> Client subscribed to stations.</p>";
             } else {
-                document.getElementById("result").innerHTML = "Error subscribing client. Status: " + xmlhttp.status;
+                document.getElementById("result").innerHTML = `<p class="error">Error subscribing client. Status: ${xmlhttp.status}</p>`;
             }
         }
     };
@@ -51,9 +93,10 @@ function getClients() {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
-                document.getElementById("result").innerHTML = "<pre>" + JSON.stringify(JSON.parse(xmlhttp.responseText), null, 2) + "</pre>";
+                const data = JSON.parse(xmlhttp.responseText);
+                document.getElementById("result").innerHTML = createHtmlTableFromJson(data);
             } else {
-                document.getElementById("result").innerHTML = "Error fetching clients. Status: " + xmlhttp.status;
+                document.getElementById("result").innerHTML = `<p class="error">Error fetching clients. Status: ${xmlhttp.status}</p>`;
             }
         }
     };
