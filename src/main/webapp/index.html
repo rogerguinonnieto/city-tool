@@ -1,5 +1,117 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BAN - Bicing Notifier</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+        section { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;}
+        label { display: block; margin-top: 10px; font-weight: bold;}
+        input { margin-bottom: 10px; width: 100%; padding: 8px; box-sizing: border-box;}
+        button { padding: 10px 15px; background-color: #0073e6; color: white; border: none; cursor: pointer; border-radius: 3px;}
+        button:hover { background-color: #005bb5; }
+        #result { margin-top: 20px; padding: 15px; background-color: #f4f4f4; border: 1px solid #ddd; min-height: 100px; overflow-wrap: break-word;}
+        pre { white-space: pre-wrap; }
+    </style>
+    <script>
+        const BASE_URL = "http://localhost:8080/ban/api";
+
+        function getStations() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4) {
+                    if(xmlhttp.status == 200) {
+                        // Formatting the JSON response to look nice in the div
+                        document.getElementById("result").innerHTML = "<pre>" + JSON.stringify(JSON.parse(xmlhttp.responseText), null, 2) + "</pre>";
+                    } else {
+                        document.getElementById("result").innerHTML = "Error fetching stations. Status: " + xmlhttp.status;
+                    }
+                }
+            };
+            xmlhttp.open("GET", BASE_URL + "/stations", true); // Matches @Path("/stations")
+            xmlhttp.send();
+        }
+
+        function subscribeClient() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4) {
+                    if(xmlhttp.status == 200) {
+                        document.getElementById("result").innerHTML = "<strong>Success!</strong> Client subscribed to stations.";
+                    } else {
+                        document.getElementById("result").innerHTML = "Error subscribing client. Status: " + xmlhttp.status;
+                    }
+                }
+            };
+
+            // 1. Get values from the form
+            var phoneStr = document.getElementById("phone").value;
+            var stationsStr = document.getElementById("stationsIds").value;
+            var token = document.getElementById("telegramToken").value;
+            var chat = document.getElementById("chatId").value;
+
+            // 2. Convert comma-separated string to an array of integers for your Java List<Integer>
+            var stationsArray = stationsStr.replace(/\s/g,"").split(",").map(Number);
+
+            // 3. Build the JSON object matching your Client.java model
+            var params = {
+                "phoneNumber": parseInt(phoneStr),
+                "stationIds": stationsArray,
+                "botToken": token,
+                "chatId": chat
+            };
+
+            xmlhttp.open("POST", BASE_URL + "/clients/subscribe", true); // Matches @Path("/clients") + @Path("/subscribe")
+            xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xmlhttp.send(JSON.stringify(params));
+        }
+
+        function getClients() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4) {
+                    if(xmlhttp.status == 200) {
+                        document.getElementById("result").innerHTML = "<pre>" + JSON.stringify(JSON.parse(xmlhttp.responseText), null, 2) + "</pre>";
+                    } else {
+                        document.getElementById("result").innerHTML = "Error fetching clients. Status: " + xmlhttp.status;
+                    }
+                }
+            };
+            xmlhttp.open("GET", BASE_URL + "/clients", true); // Matches @Path("/clients")
+            xmlhttp.send();
+        }
+    </script>
+</head>
 <body>
-<h2>Hello World!</h2>
+    <h1>Bicing Free Slots Notifier (BAN)</h1>
+
+    <section>
+        <h2>1. Get Stations</h2>
+        <p>Retrieve the cached list of Bicing stations.</p>
+        <button type="button" onclick="getStations()">Get Stations</button>
+    </section>
+
+    <section>
+        <h2>2. Subscribe Client to Stations</h2>
+        <form id="subscribeForm">
+            <label for="phone">Phone Number:</label>
+            <input type="number" id="phone" placeholder="e.g., 600123456" required>
+
+            <label for="stationsIds">Station IDs (comma-separated):</label>
+            <input type="text" id="stationsIds" placeholder="e.g., 1, 5, 12" required>
+
+            <button type="button" onclick="subscribeClient()">Subscribe Client</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>3. Get Subscribed Clients</h2>
+        <p>Retrieve the list of all registered clients.</p>
+        <button type="button" onclick="getClients()">Get Clients</button>
+    </section>
+
+    <h2>Response Output:</h2>
+    <div id="result">Responses from the server will appear here...</div>
+
 </body>
 </html>
