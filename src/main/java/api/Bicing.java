@@ -3,6 +3,7 @@ package api;
 import io.github.cdimascio.dotenv.Dotenv;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
+import model.Data;
 
 public class Bicing {
     // Load environment variables

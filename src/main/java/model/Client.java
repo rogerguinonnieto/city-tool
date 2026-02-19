@@ -1,4 +1,5 @@
 package model;
+import java.util.List;
 
 public class Client {
     public int phoneNumber;
