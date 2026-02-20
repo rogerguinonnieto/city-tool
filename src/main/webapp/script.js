@@ -49,6 +49,10 @@ function createStationList(stations) {
     let html = '<div class="station-list-container">';
     stations.forEach(s => {
         const id = s.station_id || "N/A";
+        const name = s.name || "Unknown Station";
+        const lat = s.lat || 0;
+        const lon = s.lon || 0;
+        const mapsLink = `https://www.google.com/maps/place/${lat},${lon}`;
         const bikes = s.num_bikes_available ?? 0;
         const docks = s.num_docks_available ?? 0;
         const status = s.status || "UNKNOWN";
@@ -57,6 +61,7 @@ function createStationList(stations) {
         html += `
             <div class="station-card" onclick="selectStation('${id}')">
                 <div class="station-id">STATION #${id}</div>
+                <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="station-name">${name}</a>
                 <div class="station-info">
                     <div class="info-row">
                         <span class="label">Bikes:</span>

@@ -3,12 +3,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Station {
+    // Api url1
     private int station_id;
     private int num_bikes_available;
     private int num_docks_available;
     private long last_reported;
     private boolean is_charging_station;
     private String status;
+
+    // Api url2
+    private String name;
+    private float lat;
+    private float lon;
 
     public Station() {
     }
@@ -67,6 +73,30 @@ public class Station {
         this.status = status;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public float getLat() {
+        return lat;
+    }
+
+    public void setLat(float lat) {
+        this.lat = lat;
+    }
+
+    public float getLon() {
+        return lon;
+    }
+
+    public void setLon(float lon) {
+        this.lon = lon;
+    }
+
     @Override
     public String toString() {
         return "Station{" +
@@ -76,6 +106,9 @@ public class Station {
                 ", last_reported=" + last_reported +
                 ", is_charging_station=" + is_charging_station +
                 ", status='" + status + '\'' +
+                ", name='" + name + '\'' +
+                ", lat=" + lat +
+                ", lon=" + lon +
                 '}';
     }
 
