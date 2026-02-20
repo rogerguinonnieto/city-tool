@@ -1,4 +1,5 @@
 /target
 .env
-
+compileRun.bat
 /.vscode
+compileRun.bat
