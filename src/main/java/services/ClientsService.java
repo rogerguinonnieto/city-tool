@@ -9,6 +9,7 @@ import javax.ws.rs.Consumes;
 import java.util.ArrayList;
 import java.util.List;
 import model.Client;
+import api.OpenGateway;
 
 @Path("/clients")
 public class ClientsService {
@@ -18,9 +19,22 @@ public class ClientsService {
     @Path("/subscribe")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response subscribe(Client client) {
+    try {
+        // threshold is 21 as per project description
+        boolean isVerified = OpenGateway.verifyAge(client.getPhoneNumber(), 21);
+        
+        if (!isVerified) {
+            return Response.status(Response.Status.FORBIDDEN)
+                           .entity("{\"error\": \"Age verification failed. Must be 21+.\"}")
+                           .build();
+        }
+
         clients.add(client);
         return Response.ok().build();
+    } catch (Exception e) {
+        return Response.status(500).entity("{\"error\": \"System error during verification\"}").build();
     }
+}
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
