@@ -158,10 +158,14 @@ async function subscribeClient() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
-            if(xmlhttp.status == 200) {
-                document.getElementById("result").innerHTML = "<p class='success'><strong>Success!</strong> Client subscribed to stations.</p>";
+            if (xmlhttp.status == 200) {
+                document.getElementById("result").innerHTML = "<strong>Success!</strong> Client subscribed.";
+            } else if (xmlhttp.status == 403) {
+                // Read the "Age verification failed" message we sent from Java
+                var response = JSON.parse(xmlhttp.responseText);
+                document.getElementById("result").innerHTML = "<strong>Access Denied:</strong> " + response.error;
             } else {
-                document.getElementById("result").innerHTML = `<p class="error">Error subscribing client. Status: ${xmlhttp.status}</p>`;
+                document.getElementById("result").innerHTML = "Error: " + xmlhttp.status;
             }
         }
     };
