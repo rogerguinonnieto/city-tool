@@ -18,7 +18,13 @@
             </section>
 
             <section>
-                <h2>2. Subscribe Client</h2>
+                <h2>2. Member Access</h2>
+                <p>Manage your subscriptions and services.</p>
+                <button type="button" onclick="openClientSpace()">Open Client Space</button>
+            </section>
+
+            <section>
+                <h2>3. Subscribe Client</h2>
                 <form id="subscribeForm">
                     <div class="field">
                         <label for="phone">Phone Number</label>
@@ -41,7 +47,7 @@
             </section>
 
             <section>
-                <h2>3. Get Clients</h2>
+                <h2>4. Get Clients</h2>
                 <p>Retrieve the list of all registered clients.</p>
                 <button type="button" onclick="getClients()">Get Clients</button>
             </section>
@@ -59,5 +65,37 @@
     </div>
 
     <script src="script.js"></script>
+
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Client Space</h2>
+                <span class="close" onclick="closeClientSpace()">&times;</span>
+            </div>
+            
+            <div id="loginSection">
+                <p>Enter your phone number to access your space.</p>
+                <div class="field">
+                    <input type="text" id="loginPhone" placeholder="Phone Number (9 digits)" pattern="[0-9]{9}">
+                    <button type="button" style="margin-top: 10px;" onclick="loginClient()">Login</button>
+                </div>
+            </div>
+
+            <div id="dashboardSection" style="display: none;">
+                <div class="client-section">
+                    <h3>Subscribed Stations</h3>
+                    <div id="subscribedList" class="mini-list"></div>
+                </div>
+                
+                <div class="client-section">
+                    <h3>Notifier Telegram Service</h3>
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="requestAirQuality()">Air Quality Info</button>
+                        <button class="btn-secondary" onclick="requestFreeSlots()">Free Slots (My Stations)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
