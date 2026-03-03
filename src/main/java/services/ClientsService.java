@@ -42,6 +42,23 @@ public class ClientsService {
         return Response.ok(clients).build();
     }
 
+    @POST
+    @Path("/removeStation/{phone}/{stationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeStation(@javax.ws.rs.PathParam("phone") int phone, 
+                                 @javax.ws.rs.PathParam("stationId") int stationId) {
+        Client client = getClientByPhone(phone);
+        
+        if (client != null) {
+            client.removeStationId(stationId);
+            return Response.ok("{\"message\": \"Station removed successfully\"}").build();
+        }
+        
+        return Response.status(Response.Status.NOT_FOUND)
+                       .entity("{\"error\": \"Client not found\"}")
+                       .build();
+    }
+    
     public static Client getClientByPhone(int phone) {
         for (Client c : clients) {
             if (c.getPhoneNumber() == phone) {
