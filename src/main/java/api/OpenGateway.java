@@ -4,7 +4,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
 import org.json.JSONObject;
-
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 public class OpenGateway {
@@ -14,46 +13,72 @@ public class OpenGateway {
     private static final String BASE_URL = "https://sandbox.opengateway.telefonica.com/apigateway";
 
     public static boolean verifyAge(int phoneNumber, int threshold) throws Exception {
-        String authReqId = getAuthReqId(phoneNumber);
-        String accessToken = getAccessToken(authReqId);
-        return callVerifyAgeAPI(accessToken, phoneNumber, threshold);
+        try {
+            System.out.println("[OG] Starting age verification for: " + phoneNumber);
+            
+            String authReqId = getAuthReqId(phoneNumber);
+            System.out.println("[OG] Received authReqId: " + authReqId);
+
+            String accessToken = getAccessToken(authReqId);
+            System.out.println("[OG] Received Access Token successfully.");
+
+            boolean result = callVerifyAgeAPI(accessToken, phoneNumber, threshold);
+            System.out.println("[OG] Final verification result: " + result);
+            
+            return result;
+        } catch (Exception e) {
+            System.err.println("[OG ERROR] Verification flow crashed: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-throw to be caught by your Service class
+        }
     }
 
-    private static String getAuthReqId(int phone) {
+    private static String getAuthReqId(int phone) throws Exception {
         Client client = ClientBuilder.newClient();
         Form form = new Form()
             .param("login_hint", "tel:+" + phone)
-            .param("scope", "dpv:FraudPreventionAndDetection#verify-age");
+            .param("scope", "dpv:FraudPreventionAndDetection#kyc-age-verification:verify");
 
         Response response = client.target(BASE_URL + "/bc-authorize")
+            .register(HttpAuthenticationFeature.basic(CLIENT_ID, CLIENT_SECRET))
             .request(MediaType.APPLICATION_JSON)
-            .header("Authorization", HttpAuthenticationFeature.basic(CLIENT_ID, CLIENT_SECRET))
             .post(Entity.form(form));
 
-        return new JSONObject(response.readEntity(String.class)).getString("auth_req_id");
+        String entity = response.readEntity(String.class);
+        if (response.getStatus() != 200 && response.getStatus() != 201) {
+            System.err.println("[OG ERROR] /bc-authorize failed. Status: " + response.getStatus());
+            System.err.println("[OG ERROR] Response: " + entity);
+            throw new Exception("Auth Request failed with status " + response.getStatus());
+        }
+        return new JSONObject(entity).getString("auth_req_id");
     }
 
-    private static String getAccessToken(String authReqId) {
+    private static String getAccessToken(String authReqId) throws Exception {
         Client client = ClientBuilder.newClient();
         Form form = new Form()
             .param("grant_type", "urn:openid:params:grant-type:ciba")
             .param("auth_req_id", authReqId);
 
         Response response = client.target(BASE_URL + "/token")
+            .register(HttpAuthenticationFeature.basic(CLIENT_ID, CLIENT_SECRET))
             .request(MediaType.APPLICATION_JSON)
-            .header("Authorization", HttpAuthenticationFeature.basic(CLIENT_ID, CLIENT_SECRET))
             .post(Entity.form(form));
-        return new JSONObject(response.readEntity(String.class)).getString("access_token");
-        
+
+        String entity = response.readEntity(String.class);
+        if (response.getStatus() != 200) {
+            System.err.println("[OG ERROR] /token failed. Status: " + response.getStatus());
+            System.err.println("[OG ERROR] Response: " + entity);
+            throw new Exception("Token retrieval failed");
+        }
+        return new JSONObject(entity).getString("access_token");
     }
 
     private static boolean callVerifyAgeAPI(String token, int phone, int threshold) {
         Client client = ClientBuilder.newClient();
-        String verifyUrl = "https://sandbox.opengateway.telefonica.com/kyc-age-verification/v0.1/verify";
+        String verifyUrl = "https://sandbox.opengateway.telefonica.com/apigateway/kyc-age-verification/v0.1/verify";
         
         JSONObject body = new JSONObject();
         body.put("ageThreshold", threshold);
-        body.put("phoneNumber", "+" + phone);
 
         Response response = client.target(verifyUrl)
             .request(MediaType.APPLICATION_JSON)
@@ -61,11 +86,15 @@ public class OpenGateway {
             .header("x-correlator", java.util.UUID.randomUUID().toString())
             .post(Entity.json(body.toString()));
 
+        String entity = response.readEntity(String.class);
         if (response.getStatus() == 200) {
-            JSONObject resJson = new JSONObject(response.readEntity(String.class));
+            JSONObject resJson = new JSONObject(entity);
             String result = resJson.getString("ageCheck");
             return "true".equals(result);
+        } else {
+            System.err.println("[OG ERROR] /verify API failed. Status: " + response.getStatus());
+            System.err.println("[OG ERROR] Response: " + entity);
+            return false;
         }
-        return false;
     }
 }

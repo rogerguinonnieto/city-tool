@@ -56,12 +56,6 @@ public class Bicing {
                 station.setName(infoStation.getName());
                 station.setLat(infoStation.getLat());
                 station.setLon(infoStation.getLon());
-                System.out.println("Station ID: " + station.getStation_id() + 
-                        " | Name: " + station.getName() + 
-                        " | Lat: " + station.getLat() + 
-                        " | Lon: " + station.getLon() + 
-                        " | Bikes: " + station.getNum_bikes_available() + 
-                        " | Docks: " + station.getNum_docks_available());
             }
         }
         System.out.println("Total stations merged: " + stations1.size());

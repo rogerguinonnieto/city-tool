@@ -158,10 +158,14 @@ async function subscribeClient() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
-            if(xmlhttp.status == 200) {
-                document.getElementById("result").innerHTML = "<p class='success'><strong>Success!</strong> Client subscribed to stations.</p>";
+            if (xmlhttp.status == 200) {
+                document.getElementById("result").innerHTML = "<strong>Success!</strong> Client subscribed.";
+            } else if (xmlhttp.status == 403) {
+                // Read the "Age verification failed" message we sent from Java
+                var response = JSON.parse(xmlhttp.responseText);
+                document.getElementById("result").innerHTML = "<strong>Access Denied:</strong> " + response.error;
             } else {
-                document.getElementById("result").innerHTML = `<p class="error">Error subscribing client. Status: ${xmlhttp.status}</p>`;
+                document.getElementById("result").innerHTML = "Error: " + xmlhttp.status;
             }
         }
     };
@@ -199,4 +203,67 @@ function getClients() {
     };
     xmlhttp.open("GET", BASE_URL + "/clients", true);
     xmlhttp.send();
+}
+
+let currentLoggedPhone = null;
+
+function openClientSpace() {
+    document.getElementById("clientModal").style.display = "block";
+}
+
+function closeClientSpace() {
+    document.getElementById("clientModal").style.display = "none";
+}
+
+async function loginClient() {
+    const phone = document.getElementById("loginPhone").value;
+    if (!/^[0-9]{9}$/.test(phone)) {
+        alert("Please enter a valid 9-digit phone number.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/clients`);
+        const clients = await response.json();
+        const client = clients.find(c => c.phoneNumber == phone);
+
+        if (client) {
+            currentLoggedPhone = phone;
+            showDashboard(client);
+        } else {
+            alert("Client not found. Please subscribe first.");
+        }
+    } catch (err) {
+        alert("Error connecting to server.");
+    }
+}
+
+function showDashboard(client) {
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("dashboardSection").style.display = "block";
+    renderSubscribedStations(client.stationIds);
+}
+
+function renderSubscribedStations(stationIds) {
+    const list = document.getElementById("subscribedList");
+    list.innerHTML = stationIds.map(id => `
+        <div class="mini-item">
+            <span>Station #${id}</span>
+            <button class="btn-remove" onclick="removeStation(${id})">Remove</button>
+        </div>
+    `).join('');
+}
+
+// Placeholder functions for the requested buttons
+function removeStation(id) {
+    console.log(`Removing station ${id} for client ${currentLoggedPhone}`);
+    // Implement DELETE or PUT API call here
+}
+
+function requestAirQuality() {
+    alert(`Air quality info sent to Telegram for ${currentLoggedPhone}`);
+}
+
+function requestFreeSlots() {
+    alert(`Free slots info sent to Telegram for ${currentLoggedPhone}`);
 }

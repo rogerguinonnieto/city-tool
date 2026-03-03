@@ -35,6 +35,12 @@ public class ClientsService {
             return Response.status(500).entity("{\"error\": \"System error during verification\"}").build();
         }
     }
+            clients.add(client);
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(500).entity("{\"error\": \"System error during verification\"}").build();
+        }
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
