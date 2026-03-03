@@ -137,27 +137,21 @@ async function subscribeClient() {
 
     phoneInput.style.borderColor = "var(--border)";
     // 1. Pre-check: Fetch existing clients
-    try {
-        const response = await fetch(BASE_URL + "/clients");
-        const existingClients = await response.json();
-        
-        // 2. Look for the phone number
-        const alreadyExists = existingClients.some(c => c.phoneNumber === phoneValue);
-        
-        if (alreadyExists) {
-            document.getElementById("result").innerHTML = 
-                `<p class="error"><strong>Wait!</strong> Phone number ${phoneValue} is already subscribed.</p>`;
-            phoneInput.style.borderColor = "var(--error)";
-            return; // Stop the function here
-        }
-    } catch (err) {
-        console.warn("Could not verify existing clients, proceeding anyway...");
+    const response = await fetch(BASE_URL + "/clients");
+    const existingClients = await response.json();
+    
+    // 2. Look for the phone number
+    const alreadyExists = existingClients.some(c => c.phoneNumber === phoneValue);
+    
+    if (alreadyExists) {
+        document.getElementById("result").innerHTML = 
+            `<p class="message" style="color: var(--accent);">Client already exists. Updating subscriptions...</p>`;
     }
 
     // 3. If it doesn't exist, proceed with the original POST request
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4) {
+        if (xmlhttp.readyState == 4 && !alreadyExists) {
             if (xmlhttp.status == 200) {
                 document.getElementById("result").innerHTML = "<strong>Success!</strong> Client subscribed.";
             } else if (xmlhttp.status == 403) {

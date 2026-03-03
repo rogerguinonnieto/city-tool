@@ -18,10 +18,10 @@ public class ClientsService {
     @POST
     @Path("/subscribe")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response subscribe(Client client) {
+    public Response subscribe(Client newClient) {
         try {
-            // threshold is 22 as per project description
-            boolean isVerified = OpenGateway.verifyAge(client.getPhoneNumber(), 22);
+            // 1. Verify age first
+            boolean isVerified = OpenGateway.verifyAge(newClient.getPhoneNumber(), 22);
             
             if (!isVerified) {
                 return Response.status(Response.Status.FORBIDDEN)
@@ -29,10 +29,27 @@ public class ClientsService {
                             .build();
             }
 
-            clients.add(client);
-            return Response.ok().build();
+            // 2. Check if client already exists
+            Client existingClient = getClientByPhone(newClient.getPhoneNumber());
+
+            if (existingClient != null) {
+                // Merge station IDs, avoiding duplicates
+                for (Integer id : newClient.getStationIds()) {
+                    if (!existingClient.getStationIds().contains(id)) {
+                        existingClient.addStationId(id);
+                    }
+                }
+                // Optionally update the chatId if it changed
+                existingClient.setChatId(newClient.getChatId());
+                
+                return Response.ok("{\"message\": \"Client updated with new stations\"}").build();
+            } else {
+                // 3. New client registration
+                clients.add(newClient);
+                return Response.ok("{\"message\": \"New client subscribed successfully\"}").build();
+            }
         } catch (Exception e) {
-            return Response.status(500).entity("{\"error\": \"System error during verification\"}").build();
+            return Response.status(500).entity("{\"error\": \"System error\"}").build();
         }
     }
 
