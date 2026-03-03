@@ -255,9 +255,29 @@ function renderSubscribedStations(stationIds) {
 }
 
 // Placeholder functions for the requested buttons
-function removeStation(id) {
-    console.log(`Removing station ${id} for client ${currentLoggedPhone}`);
-    // Implement DELETE or PUT API call here
+async function removeStation(stationId) {
+    if (!currentLoggedPhone) return;
+
+    try {
+        const response = await fetch(`${BASE_URL}/clients/removeStation/${currentLoggedPhone}/${stationId}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            // Refresh the local UI by fetching the updated client data
+            const clientsRes = await fetch(`${BASE_URL}/clients`);
+            const clients = await clientsRes.json();
+            const updatedClient = clients.find(c => c.phoneNumber == currentLoggedPhone);
+            
+            if (updatedClient) {
+                renderSubscribedStations(updatedClient.stationIds);
+            }
+        } else {
+            alert("Failed to remove station.");
+        }
+    } catch (err) {
+        console.error("Error removing station:", err);
+    }
 }
 
 function requestAirQuality() {

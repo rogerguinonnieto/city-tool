@@ -20,7 +20,7 @@ public class ClientsService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response subscribe(Client client) {
         try {
-            // threshold is 21 as per project description
+            // threshold is 22 as per project description
             boolean isVerified = OpenGateway.verifyAge(client.getPhoneNumber(), 22);
             
             if (!isVerified) {
@@ -40,5 +40,31 @@ public class ClientsService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getClients() {
         return Response.ok(clients).build();
+    }
+
+    @POST
+    @Path("/removeStation/{phone}/{stationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeStation(@javax.ws.rs.PathParam("phone") int phone, 
+                                 @javax.ws.rs.PathParam("stationId") int stationId) {
+        Client client = getClientByPhone(phone);
+        
+        if (client != null) {
+            client.removeStationId(stationId);
+            return Response.ok("{\"message\": \"Station removed successfully\"}").build();
+        }
+        
+        return Response.status(Response.Status.NOT_FOUND)
+                       .entity("{\"error\": \"Client not found\"}")
+                       .build();
+    }
+
+    public static Client getClientByPhone(int phone) {
+        for (Client c : clients) {
+            if (c.getPhoneNumber() == phone) {
+                return c;
+            }
+        }
+        return null;
     }
 }
