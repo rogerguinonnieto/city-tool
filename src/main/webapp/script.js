@@ -280,10 +280,49 @@ async function removeStation(stationId) {
     }
 }
 
-function requestAirQuality() {
-    alert(`Air quality info sent to Telegram for ${currentLoggedPhone}`);
+function requestFreeSlots() {
+    var xmlhttp = new XMLHttpRequest();
+    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === 4) {
+            if (xmlhttp.status === 200) {
+                alert(`Success! Free slots info sent to Telegram for ${currentLoggedPhone}`);
+            } else {
+                alert(`Error sending slots notification. Server returned status: ${xmlhttp.status}`);
+            }
+        }
+    };
+
+    xmlhttp.open("POST", "api/notifier/slots", true);
+    xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    
+    var params = {
+        "phone": parseInt(currentLoggedPhone)
+    };
+    
+    xmlhttp.send(JSON.stringify(params));
 }
 
-function requestFreeSlots() {
-    alert(`Free slots info sent to Telegram for ${currentLoggedPhone}`);
+function requestAirQuality() {
+    var xmlhttp = new XMLHttpRequest();
+    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === 4) {
+            if (xmlhttp.status === 200) {
+                alert(`Success! Air quality info sent to Telegram for ${currentLoggedPhone}`);
+            } else {
+                alert(`Error sending air quality notification. Server returned status: ${xmlhttp.status}`);
+            }
+        }
+    };
+
+    xmlhttp.open("POST", "api/notifier/airquality", true);
+    xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    
+    var params = {
+        "phone": parseInt(currentLoggedPhone),
+        "ip": ""
+    };
+    
+    xmlhttp.send(JSON.stringify(params));
 }
