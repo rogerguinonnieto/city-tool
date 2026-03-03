@@ -33,6 +33,14 @@ public class Client {
         this.stationIds = stationIds;
     }
 
+    public void addStationId(int stationId) {
+        this.stationIds.add(stationId);
+    }
+
+    public void removeStationId(int stationId) {
+        this.stationIds.remove(Integer.valueOf(stationId));
+    }
+
     public String getBotToken() {
         return botToken;
     }
