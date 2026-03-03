@@ -4,9 +4,11 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import model.Client;
 import model.NotifierRequest;
@@ -73,7 +75,7 @@ public class NotifierService {
     @Path("/airquality")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response notifyAirQuality(NotifierRequest request) {
+    public Response notifyAirQuality(NotifierRequest request, @Context HttpServletRequest remoteRequest) {
         // 1. Find the client
         Client client = ClientsService.getClientByPhone(request.getPhone());
         if (client == null) {
@@ -81,12 +83,27 @@ public class NotifierService {
                            .entity("{\"error\":\"Client not found\"}").build();
         }
 
-        // 2. Determine IP from the incoming JSON request
-        String ipAddress = request.getIp();
+        // 2. Determine IP from Headers
+        String ipAddress = remoteRequest.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            ipAddress = remoteRequest.getRemoteAddr();
+        }
+        
+        // If multiple IPs in X-Forwarded-For, take the first one
+        if (ipAddress != null && ipAddress.contains(",")) {
+            ipAddress = ipAddress.split(",")[0].trim();
+        }
+
+        // Fallback to your demo default if local/null
+        if (ipAddress == null || ipAddress.equals("0:0:0:0:0:0:0:1") || ipAddress.equals("127.0.0.1")) {
+            System.out.println("Localhost IP detected, using default Barcelona IP for demo.");
+            ipAddress = "213.195.118.92"; 
+        }
         
         // If the frontend didn't send an IP, use a default Barcelona IP so the API doesn't crash during your demo
         if (ipAddress == null || ipAddress.isEmpty()) {
-            ipAddress = "147.83.10.10"; 
+            System.out.println("No IP detected, using default Barcelona IP for demo.");
+            ipAddress = "213.195.118.92"; 
         }
 
         // 3. Translate IP to City
