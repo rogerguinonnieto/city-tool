@@ -2,3 +2,4 @@
 .env
 compileRun.bat
 /.vscode
+/.metadata
