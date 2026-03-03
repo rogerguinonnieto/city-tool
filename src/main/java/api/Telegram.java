@@ -1,5 +1,6 @@
 package api;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -8,10 +9,10 @@ import javax.ws.rs.core.MediaType;
 import model.Message;
 
 public class Telegram {
-
+    private static final Dotenv dotenv = Dotenv.load();
     private static final String TELEGRAM_API_URL = "https://api.telegram.org";
-    private static final String BOT_TOKEN = System.getenv("TELEGRAM_BOT_TOKEN");
-    private static final String CHAT_ID = System.getenv("TELEGRAM_CHAT_ID");
+    private static final String BOT_TOKEN = dotenv.get("TELEGRAM_BOT_TOKEN");
+    private static final String CHAT_ID = dotenv.get("TELEGRAM_CHAT_ID");
 
     public static String sendMessage(String text) {
         Message message = new Message(Long.parseLong(CHAT_ID), text);

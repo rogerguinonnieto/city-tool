@@ -293,7 +293,7 @@ function requestFreeSlots() {
         }
     };
 
-    xmlhttp.open("POST", "api/notifier/slots", true);
+    xmlhttp.open("POST", `${BASE_URL}/notifier/slots`, true);
     xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     var params = {
@@ -316,7 +316,7 @@ function requestAirQuality() {
         }
     };
 
-    xmlhttp.open("POST", "api/notifier/airquality", true);
+    xmlhttp.open("POST", `${BASE_URL}/notifier/airquality`, true);
     xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     var params = {
