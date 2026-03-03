@@ -47,7 +47,7 @@ public class NotifierService {
         List<Integer> subscribedIds = client.getStationIds();
 
         // 3. Build the Telegram message
-        StringBuilder message = new StringBuilder("🚲 *Your Bicing Update* 🚲\n\n");
+        StringBuilder message = new StringBuilder("🚲 Your Bicing Update 🚲\n\n");
         boolean hasStations = false;
 
         for (Station station : allStations) {
@@ -100,7 +100,7 @@ public class NotifierService {
             ipAddress = "213.195.118.92"; 
         }
         
-        // If the frontend didn't send an IP, use a default Barcelona IP so the API doesn't crash during your demo
+        // If the frontend didn't send an IP, use a default Barcelona IP so the API doesn't crash
         if (ipAddress == null || ipAddress.isEmpty()) {
             System.out.println("No IP detected, using default Barcelona IP for demo.");
             ipAddress = "213.195.118.92"; 
@@ -122,7 +122,7 @@ public class NotifierService {
 
         // 5. Translate numerical AQI to conceptual level and send message
         String aqiDescription = AirQuality.translateAqi(aqiNumber);
-        String message = "🌍 *Air Quality Update* 🌍\n\n" +
+        String message = "🌍 Air Quality Update 🌍\n\n" +
                          "City: " + city + "\n" +
                          "AQI: " + aqiNumber + "\n" +
                          "Status: " + aqiDescription;
