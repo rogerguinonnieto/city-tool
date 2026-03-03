@@ -4,16 +4,14 @@ import java.util.List;
 public class Client {
     public int phoneNumber;
     public List<Integer> stationIds;
-    public String botToken;
     public String chatId;
 
     public Client() {
     }
 
-    public Client(int phoneNumber, List<Integer> stationIds, String botToken, String chatId) {
+    public Client(int phoneNumber, List<Integer> stationIds, String chatId) {
         this.phoneNumber = phoneNumber;
         this.stationIds = stationIds;
-        this.botToken = botToken;
         this.chatId = chatId;
     }
 
@@ -41,14 +39,6 @@ public class Client {
         this.stationIds.remove(Integer.valueOf(stationId));
     }
 
-    public String getBotToken() {
-        return botToken;
-    }
-
-    public void setBotToken(String botToken) {
-        this.botToken = botToken;
-    }
-
     public String getChatId() {
         return chatId;
     }
@@ -62,7 +52,6 @@ public class Client {
         return "Client{" +
                 "phoneNumber=" + phoneNumber +
                 ", stationIds=" + stationIds +
-                ", botToken='" + botToken + '\'' +
                 ", chatId='" + chatId + '\'' +
                 '}';
     }

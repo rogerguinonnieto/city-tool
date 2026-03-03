@@ -172,7 +172,6 @@ async function subscribeClient() {
 
     const phoneStr = document.getElementById("phone").value;
     const stationsStr = document.getElementById("stationsIds").value;
-    const token = document.getElementById("telegramToken").value;
     const chat = document.getElementById("chatId").value;
 
     const stationsArray = stationsStr.replace(/\s/g,"").split(",").map(Number);
@@ -180,7 +179,6 @@ async function subscribeClient() {
     const params = {
         "phoneNumber": parseInt(phoneStr),
         "stationIds": stationsArray,
-        "botToken": token,
         "chatId": chat
     };
 
