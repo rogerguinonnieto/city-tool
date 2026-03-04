@@ -21,11 +21,18 @@ public class ClientsService {
     public Response subscribe(Client newClient) {
         try {
             // 1. Verify age first
-            boolean isVerified = OpenGateway.verifyAge(newClient.getPhoneNumber(), 22);
+            boolean isAgeVerified = OpenGateway.verifyAge(newClient.getPhoneNumber(), 22);
             
-            if (!isVerified) {
+            if (!isAgeVerified) {
                 return Response.status(Response.Status.FORBIDDEN)
                             .entity("{\"error\": \"Age verification failed. Must be 21+.\"}")
+                            .build();
+            }
+
+            boolean isNameVerified = OpenGateway.verifyName(newClient.getPhoneNumber(), newClient.getName());
+            if (!isNameVerified) {
+                return Response.status(Response.Status.FORBIDDEN)
+                            .entity("{\"error\": \"Name verification failed. Name does not match records.\"}")
                             .build();
             }
 

@@ -2,6 +2,7 @@ package model;
 import java.util.List;
 
 public class Client {
+    public String name;
     public int phoneNumber;
     public List<Integer> stationIds;
     public String chatId;
@@ -9,10 +10,19 @@ public class Client {
     public Client() {
     }
 
-    public Client(int phoneNumber, List<Integer> stationIds, String chatId) {
+    public Client(String name, int phoneNumber, List<Integer> stationIds, String chatId) {
+        this.name = name;
         this.phoneNumber = phoneNumber;
         this.stationIds = stationIds;
         this.chatId = chatId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getPhoneNumber() {
@@ -50,7 +60,8 @@ public class Client {
     @Override
     public String toString() {
         return "Client{" +
-                "phoneNumber=" + phoneNumber +
+                "name='" + name + '\'' +
+                ", phoneNumber=" + phoneNumber +
                 ", stationIds=" + stationIds +
                 ", chatId='" + chatId + '\'' +
                 '}';

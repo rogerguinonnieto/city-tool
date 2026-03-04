@@ -90,12 +90,13 @@ function createClientList(clients) {
 
     let html = '<div class="station-list-container">';
     clients.forEach(c => {
+        const name = c.name || "Unnamed Client";
         const phone = c.phoneNumber || "Unknown";
         const stations = Array.isArray(c.stationIds) ? c.stationIds.join(", ") : (c.stationIds || "None");
         
         html += `
             <div class="station-card client-card">
-                <div class="station-id">CLIENT: ${phone}</div>
+                <div class="station-id">CLIENT: ${name} (${phone})</div>
                 <div class="station-info">
                     <div class="info-row"><span class="label">Subscriptions:</span></div>
                     <div class="value" style="font-size: 11px; margin-top: 4px; color: var(--accent);">
@@ -164,6 +165,7 @@ async function subscribeClient() {
         }
     };
 
+    const name = document.getElementById("name").value.trim();
     const phoneStr = document.getElementById("phone").value;
     const stationsStr = document.getElementById("stationsIds").value;
     const chat = document.getElementById("chatId").value;
@@ -171,6 +173,7 @@ async function subscribeClient() {
     const stationsArray = stationsStr.replace(/\s/g,"").split(",").map(Number);
 
     const params = {
+        "name": name,
         "phoneNumber": parseInt(phoneStr),
         "stationIds": stationsArray,
         "chatId": chat
